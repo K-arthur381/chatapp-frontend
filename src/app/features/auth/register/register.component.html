@@ -1,0 +1,75 @@
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 px-4 py-4 md:py-8 overflow-y-auto">
+  <div class="w-full max-w-2xl my-auto">
+    
+    <!-- Header -->
+    <div class="text-center mb-6 md:mb-8">
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-800">✨ Create Account</h2>
+      <p class="text-gray-500 mt-1 md:mt-2 text-sm md:text-base">Join ChitChats and start messaging</p>
+    </div>
+
+    <!-- Main Content: Avatar Left + Form Right -->
+    <div class="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+      
+      <!-- Left: Avatar Upload -->
+      <div class="flex flex-col items-center gap-2 md:gap-3 shrink-0">
+        <div class="relative">
+          <div class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-bold text-3xl md:text-4xl shadow-lg overflow-hidden">
+            <img *ngIf="avatarPreview" [src]="avatarPreview" alt="Avatar" class="w-full h-full object-cover" />
+            <span *ngIf="!avatarPreview">👤</span>
+          </div>
+          
+          <!-- Upload Button -->
+          <label class="absolute -bottom-1 -right-1 w-8 h-8 md:w-9 md:h-9 bg-white rounded-full shadow-md flex items-center justify-center cursor-pointer hover:bg-gray-50 transition border-2 border-white">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-gray-600">
+              <path d="M12 9a3.75 3.75 0 100 7.5A3.75 3.75 0 0012 9z" />
+              <path fill-rule="evenodd" d="M9.344 3.071a49.52 49.52 0 015.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 01-3 3h-15a3 3 0 01-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 001.11-.71l.822-1.315a2.942 2.942 0 012.332-1.39zM6.75 12.75a5.25 5.25 0 1110.5 0 5.25 5.25 0 01-10.5 0zm12-1.5a.75.75 0 100-1.5.75.75 0 000 1.5z" clip-rule="evenodd" />
+            </svg>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" />
+          </label>
+
+          <!-- Remove Button -->
+          <button *ngIf="avatarPreview" (click)="removeAvatar()"
+                  class="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition shadow-md">
+            ✕
+          </button>
+        </div>
+        <p class="text-xs text-gray-400 text-center">Profile photo</p>
+      </div>
+
+      <!-- Right: Form Fields -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex-1 space-y-3 md:space-y-4 w-full">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+          <input formControlName="firstName" type="text" placeholder="First Name"
+                 class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition text-sm md:text-base" />
+          
+          <input formControlName="lastName" type="text" placeholder="Last Name"
+                 class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition text-sm md:text-base" />
+        </div>
+
+        <input formControlName="username" type="text" placeholder="Username"
+               class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition text-sm md:text-base" />
+
+        <input formControlName="email" type="email" placeholder="Email"
+               class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition text-sm md:text-base" />
+
+        <input formControlName="password" type="password" placeholder="Password (min. 6 characters)"
+               class="w-full px-4 py-2.5 md:py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400 transition text-sm md:text-base" />
+
+        <button type="submit" [disabled]="registerForm.invalid || loading"
+                class="w-full py-2.5 md:py-3 rounded-xl text-white font-semibold text-base md:text-lg
+                       bg-green-600 hover:bg-green-700
+                       transition-all duration-200
+                       disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ loading ? 'Creating account...' : 'Create account' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <p class="mt-6 md:mt-8 text-center text-gray-600 text-sm md:text-base">
+      Already have an account?
+      <a routerLink="/auth/login" class="text-green-600 font-semibold hover:underline">Sign in</a>
+    </p>
+  </div>
+</div>

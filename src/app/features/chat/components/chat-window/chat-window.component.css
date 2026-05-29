@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Ensure message input is always visible */
+app-message-input {
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+
+/* Fix Chrome mobile scrolling */
+.message-container {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}

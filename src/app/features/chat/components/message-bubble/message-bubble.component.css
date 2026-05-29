@@ -1,0 +1,4 @@
+/* Ensure host is block to not break flex */
+:host {
+  display: block;
+}

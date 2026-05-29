@@ -1,0 +1,4 @@
+<div class="flex space-x-1 bg-white rounded-full shadow-md px-2 py-1 absolute -top-8 right-0">
+  <button *ngFor="let r of reactions" (click)="selectReaction(r)" 
+          class="text-lg hover:scale-125 transition-transform">{{ r }}</button>
+</div>

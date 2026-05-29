@@ -1,0 +1,99 @@
+<!-- Image Grid -->
+<div class="image-grid" [class]="gridClass">
+  <!-- Single Image -->
+  <div *ngIf="attachments.length === 1" 
+       (click)="openViewer(0)"
+       class="cursor-pointer">
+    <img [src]="attachments[0].fileUrl" 
+         class="w-full max-w-[250px] rounded-lg object-cover hover:opacity-95 transition" />
+  </div>
+
+  <!-- 2 Images - Side by side -->
+  <ng-container *ngIf="attachments.length === 2">
+    <div *ngFor="let att of displayImages; let i = index" 
+         (click)="openViewer(i)"
+         class="cursor-pointer">
+      <img [src]="att.fileUrl" 
+           class="w-full h-40 object-cover rounded-lg hover:opacity-95 transition" />
+    </div>
+  </ng-container>
+
+  <!-- 3 Images - 1 large + 2 small -->
+  <ng-container *ngIf="attachments.length === 3">
+    <div (click)="openViewer(0)" class="col-span-2 cursor-pointer">
+      <img [src]="attachments[0].fileUrl" 
+           class="w-full h-40 object-cover rounded-lg hover:opacity-95 transition" />
+    </div>
+     <!-- 2 small images side by side -->
+    <div (click)="openViewer(1)" class="cursor-pointer">
+      <img [src]="attachments[1].fileUrl" 
+           class="w-full h-20 object-cover rounded-lg hover:opacity-95 transition" />
+    </div>
+    <div (click)="openViewer(2)" class="cursor-pointer">
+      <img [src]="attachments[2].fileUrl" 
+           class="w-full h-20 object-cover rounded-lg hover:opacity-95 transition" />
+    </div>
+  </ng-container>
+
+  <!-- 4 Images - 2x2 Grid -->
+  <ng-container *ngIf="attachments.length === 4">
+    <div *ngFor="let att of displayImages; let i = index" 
+         (click)="openViewer(i)"
+         class="cursor-pointer">
+      <img [src]="att.fileUrl" 
+           class="w-full h-[110px] object-cover rounded-lg hover:opacity-95 transition" />
+    </div>
+  </ng-container>
+
+  <!-- 5+ Images - 3 cols grid with "+N" overlay -->
+  <ng-container *ngIf="attachments.length >= 5">
+    <div *ngFor="let att of displayImages; let i = index" 
+         (click)="openViewer(i)"
+         class="cursor-pointer relative">
+      <img [src]="att.fileUrl" 
+           class="w-full h-28 object-cover rounded-lg hover:opacity-95 transition" />
+      <!-- "+N" overlay on last visible image -->
+      <div *ngIf="i === 5 && remainingCount > 0" 
+           class="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+        <span class="text-white text-xl font-bold">+{{ remainingCount }}</span>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- Full Screen Viewer -->
+<div *ngIf="showViewer" 
+     class="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center"
+     (click)="closeViewer()">
+  
+  <!-- Close button -->
+  <button (click)="closeViewer()" 
+          class="absolute top-4 right-4 text-white text-3xl hover:opacity-80 z-10">
+    ✕
+  </button>
+
+  <!-- Image counter -->
+  <div class="absolute top-4 left-4 text-white text-sm bg-black/50 px-3 py-1 rounded-full z-10">
+    {{ currentIndex + 1 }} / {{ attachments.length }}
+  </div>
+
+  <!-- Previous button -->
+  <button *ngIf="currentIndex > 0" 
+          (click)="$event.stopPropagation(); prevImage()"
+          class="absolute left-4 text-white text-4xl hover:opacity-80 z-10 bg-black/30 rounded-full w-12 h-12 flex items-center justify-center">
+    ‹
+  </button>
+
+  <!-- Image -->
+  <div (click)="$event.stopPropagation()" class="max-w-[90vw] max-h-[85vh]">
+    <img [src]="currentImage.fileUrl" 
+         class="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" />
+  </div>
+
+  <!-- Next button -->
+  <button *ngIf="currentIndex < attachments.length - 1" 
+          (click)="$event.stopPropagation(); nextImage()"
+          class="absolute right-4 text-white text-4xl hover:opacity-80 z-10 bg-black/30 rounded-full w-12 h-12 flex items-center justify-center">
+    ›
+  </button>
+</div>

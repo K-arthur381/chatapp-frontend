@@ -1,0 +1,49 @@
+<!-- New Chat Button -->
+<!-- <div class="p-3 border-b bg-gray-50 shrink-0">
+  <button (click)="openNewChatDialog()" 
+          class=" bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 active:bg-blue-800 transition">
+    + New Chat
+  </button>
+</div> -->
+
+<!-- Conversation List -->
+<div class="overflow-y-auto flex-1">
+  <div *ngFor="let conv of conversations"
+       (click)="selectConversation(conv.conversationId)"
+       class="flex items-center p-3 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100 transition"
+       [class.bg-blue-50]="selectedId === conv.conversationId">
+    
+    <!-- Avatar -->
+    <app-avatar 
+      [name]="conv.type === 'Private' ? getConversationUserName(conv) : conv.groupName"
+      [url]="conv.type === 'Private' ? getConversationUserAvatarUrl(conv) : conv.groupAvatarUrl"
+      [online]="getConversationUserOnline(conv)">
+    </app-avatar>
+    
+    <!-- Content -->
+    <div class="ml-3 flex-1 min-w-0">
+      <div class="flex justify-between items-center gap-2">
+        <div class="font-semibold text-sm truncate">
+          {{ conv.type === 'Private' ? getConversationUserName(conv) : conv.groupName }}
+        </div>
+        <!-- Unread Badge -->
+        <span *ngIf="conv.unreadCount > 0"
+              class="shrink-0 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+          {{ conv.unreadCount }}
+        </span>
+      </div>
+      <div class="text-xs text-gray-400 truncate mt-0.5">
+        {{ conv.lastMessage?.content || 'Start chatting' }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="conversations.length === 0" class="p-8 text-center text-gray-400">
+    <p class="text-lg mb-2">No conversations yet</p>
+    <p class="text-sm">Start a new chat to begin messaging</p>
+  </div>
+</div>
+
+<!-- New Chat Dialog -->
+<app-new-chat-dialog *ngIf="showNewChatDialog" (close)="showNewChatDialog = false"></app-new-chat-dialog>

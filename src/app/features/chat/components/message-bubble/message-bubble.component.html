@@ -1,0 +1,152 @@
+<!-- For OWN messages -->
+<ng-container *ngIf="isOwn; else received">
+  <div class="flex justify-end mb-1">
+    <div class="max-w-[75%]">
+      <!-- Reply preview -->
+      <div *ngIf="message.replyToMessage" class="text-xs bg-blue-400/30 text-white/80 p-2 rounded-t-lg mb-0.5">
+        <div class="font-medium">↩ {{ message.replyToMessage.senderName }}</div>
+        <div class="truncate">{{ message.replyToMessage.content?.slice(0, 50) }}</div>
+      </div>
+
+      <div class="bg-[#dbeafe] px-3 py-2 rounded-lg shadow-sm relative group">
+        <!-- Deleted message -->
+        <p *ngIf="message.isDeleted" class="text-sm text-gray-400 italic">This message was deleted</p>
+
+        <!-- Text content -->
+        <p *ngIf="!message.isDeleted && message.content && message.messageType === 'Text'"
+          class="text-sm text-gray-800 whitespace-pre-wrap break-words">
+          {{ message.content }}
+          <span *ngIf="message.isEdited" class="text-[10px] text-gray-400 ml-1">(edited)</span>
+        </p>
+
+        <!-- Image attachments -->
+        <!-- <div *ngIf="!message.isDeleted && message.messageType === 'Image' && message.attachments?.length">
+          <div class="flex flex-wrap gap-1">
+            <img *ngFor="let att of message.attachments" [src]="att.fileUrl" 
+                 class="max-w-[200px] rounded-lg cursor-pointer hover:opacity-90 transition"
+                 (click)="openImage(att.fileUrl)" />
+          </div>
+        </div> -->
+        <!-- Image Gallery -->
+        <div *ngIf="!message.isDeleted && message.messageType === 'Image' && message.attachments?.length">
+          <app-image-gallery [attachments]="message.attachments" [isOwn]="true">
+          </app-image-gallery>
+        </div>
+        <!-- File attachments -->
+        <div *ngIf="!message.isDeleted && message.messageType === 'File' && message.attachments?.length">
+          <div *ngFor="let att of message.attachments" class="flex items-center gap-2 bg-white/50 rounded p-2 mb-1">
+            <span class="text-xl">📎</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-medium truncate">{{ att.fileName }}</div>
+              <div class="text-[10px] text-gray-500">{{ formatFileSize(att.fileSize) }}</div>
+            </div>
+            <a [href]="att.fileUrl" target="_blank" class="text-blue-600 text-xs hover:underline">DL</a>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end items-center mt-1 space-x-1">
+          <span class="text-[11px] text-gray-500">{{ message.sentAt | date:'HH:mm' }}</span>
+          <span class="text-[11px] text-blue-500">{{ message.readCount >= message.totalParticipants ? '✓✓' : '✓'
+            }}</span>
+        </div>
+
+        <!-- Reactions -->
+        <div *ngIf="message.reactionCounts && (message.reactionCounts | keyvalue)?.length" class="flex gap-1 mt-1">
+          <span *ngFor="let r of message.reactionCounts | keyvalue"
+            class="text-xs bg-white/80 rounded-full px-1.5 py-0.5 shadow-sm">{{ r.key }} {{ r.value }}</span>
+        </div>
+
+        <!-- Action buttons (hover) -->
+        <div class="absolute -top-3 right-2 hidden group-hover:flex gap-1 bg-white rounded-full shadow-md px-2 py-1">
+          <button (click)="toggleReactionPicker()" class="text-sm hover:scale-110 transition">😀</button>
+          <button (click)="onReply()" class="text-sm hover:scale-110 transition">↩</button>
+          <button *ngIf="!message.isDeleted" (click)="onEdit()" class="text-sm hover:scale-110 transition">✏️</button>
+          <button (click)="onDelete()" class="text-sm hover:scale-110 transition">🗑️</button>
+        </div>
+
+        <!-- Reaction picker -->
+        <div *ngIf="showReactionPicker"
+          class="absolute -top-10 right-0 bg-white rounded-full shadow-lg px-2 py-1 flex gap-1">
+          <button *ngFor="let r of ['👍','❤️','😂','😮','😢','😡']" (click)="onReaction(r)"
+            class="text-lg hover:scale-125 transition">{{ r }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<!-- For RECEIVED messages (similar, add edit/delete only if admin) -->
+<ng-template #received>
+  <div class="flex items-start space-x-2 mb-1">
+    <div class="shrink-0 mt-1">
+      <app-avatar [name]="message.sender.username" [url]="message.sender.avatarUrl"
+        class="w-7 h-7 text-xs"></app-avatar>
+    </div>
+    <div class="max-w-[75%]">
+      <div class="text-xs text-gray-500 ml-1 mb-0.5">{{ message.sender.username }}</div>
+
+ <!-- Reply preview -->
+      <div *ngIf="message.replyToMessage" class="text-xs bg-blue-400/30 text-white/80 p-2 rounded-t-lg mb-0.5">
+        <div class="font-medium">↩ {{ message.replyToMessage.senderName }}</div>
+        <div class="truncate">{{ message.replyToMessage.content?.slice(0, 50) }}</div>
+      </div>
+
+      <div class="bg-white px-3 py-2 rounded-lg shadow-sm relative group">
+        <p *ngIf="message.isDeleted" class="text-sm text-gray-400 italic">This message was deleted</p>
+
+        <p *ngIf="!message.isDeleted && message.content && message.messageType === 'Text'"
+          class="text-sm text-gray-800 whitespace-pre-wrap break-words">
+          {{ message.content }}
+          <span *ngIf="message.isEdited" class="text-[10px] text-gray-400 ml-1">(edited)</span>
+        </p>
+
+        <!-- <div *ngIf="!message.isDeleted && message.messageType === 'Image' && message.attachments?.length">
+          <div class="flex flex-wrap gap-1">
+            <img *ngFor="let att of message.attachments" [src]="att.fileUrl" 
+                 class="max-w-[200px] rounded-lg cursor-pointer hover:opacity-90 transition"
+                 (click)="openImage(att.fileUrl)" />
+          </div>
+        </div> -->
+        <!-- Image Gallery -->
+        <div *ngIf="!message.isDeleted && message.messageType === 'Image' && message.attachments?.length">
+          <app-image-gallery [attachments]="message.attachments" [isOwn]="false">
+          </app-image-gallery>
+        </div>
+
+        <div *ngIf="!message.isDeleted && message.messageType === 'File' && message.attachments?.length">
+          <div *ngFor="let att of message.attachments" class="flex items-center gap-2 bg-gray-50 rounded p-2 mb-1">
+            <span class="text-xl">📎</span>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-medium truncate">{{ att.fileName }}</div>
+              <div class="text-[10px] text-gray-500">{{ formatFileSize(att.fileSize) }}</div>
+            </div>
+            <a [href]="att.fileUrl" target="_blank" class="text-blue-600 text-xs hover:underline">DL</a>
+          </div>
+        </div>
+
+        <div class="flex justify-end items-center mt-1 space-x-1">
+          <span class="text-[11px] text-gray-400">{{ message.sentAt | date:'HH:mm' }}</span>
+        </div>
+
+        <div *ngIf="message.reactionCounts && (message.reactionCounts | keyvalue)?.length" class="flex gap-1 mt-1">
+          <span *ngFor="let r of message.reactionCounts | keyvalue"
+            class="text-xs bg-gray-100 rounded-full px-1.5 py-0.5">{{ r.key }} {{ r.value }}</span>
+        </div>
+
+        <div class="absolute -top-3 left-2 hidden group-hover:flex gap-1 bg-white rounded-full shadow-md px-2 py-1">
+          <button (click)="onReply()" class="text-sm hover:scale-110 transition">↩</button>
+          <button (click)="toggleReactionPicker()" class="text-sm hover:scale-110 transition">😀</button>
+        </div>
+
+        <div *ngIf="showReactionPicker"
+          class="absolute -top-10 left-0 bg-white rounded-full shadow-lg px-2 py-1 flex gap-1">
+          <button *ngFor="let r of ['👍','❤️','😂','😮','😢','😡']" (click)="onReaction(r)"
+            class="text-lg hover:scale-125 transition">{{ r }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+

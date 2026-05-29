@@ -1,0 +1,138 @@
+<!-- Active Chat -->
+<div *ngIf="activeConversationId" style="height: 100dvh;" class="flex-1 flex flex-col h-full bg-white">
+
+  <!-- Header -->
+  <div class="flex items-center px-3 py-2 border-b bg-white shrink-0 gap-2">
+    <button (click)="goBack()"
+      class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all duration-200">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-700">
+        <path fill-rule="evenodd"
+          d="M7.72 12.53a.75.75 0 010-1.06l7.5-7.5a.75.75 0 111.06 1.06L9.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5z"
+          clip-rule="evenodd" />
+      </svg>
+    </button>
+    <app-avatar [name]="conversationName" [url]="avatarUrl" [online]="isOnline"></app-avatar>
+    <div class="flex-1 min-w-0">
+      <div class="font-semibold text-sm truncate">{{ conversationName }}</div>
+      <div class="text-xs text-gray-400">
+        {{ isOnline ? 'Online' : (lastSeen ? 'Last seen ' + lastSeenText : 'Offline') }}
+      </div>
+    </div>
+    <!-- Members button for groups -->
+    <button *ngIf="conversationType === 'Group'" (click)="toggleMembers()"
+      class="shrink-0 text-blue-600 text-xs font-medium hover:bg-blue-50 px-2 py-1 rounded-lg transition">
+      Members
+    </button>
+  </div>
+
+  <!-- Messages Area -->
+ <div #messageContainer 
+     class="message-container flex-1 overflow-y-auto px-3 py-2 space-y-1 bg-[#e2e7eb]"
+     style="padding-bottom: 72px;"
+     (scroll)="onScroll()">
+
+    <!-- Loading older -->
+    <div *ngIf="loadingOlder" class="text-center py-3">
+      <span class="text-xs text-gray-500 bg-white/80 px-3 py-1 rounded-full">Loading...</span>
+    </div>
+
+    <!-- Messages -->
+    <div *ngFor="let msg of messages">
+      <app-message-bubble [message]="msg" [isOwn]="msg.sender.userId === currentUserId"
+        (reaction)="reactToMessage(msg.messageId, $event)" (reply)="setReply(msg)" (edit)="startEditMessage($event)"
+        (delete)="deleteMessage($event)">
+      </app-message-bubble>
+    </div>
+
+    <!-- Typing Indicator -->
+    <app-typing-indicator *ngIf="typingUsers.length"></app-typing-indicator>
+  </div>
+
+  <!-- New Messages Banner -->
+  <div *ngIf="showNewMessageBanner" (click)="scrollToNewMessages()"
+    class="cursor-pointer bg-blue-500 text-white text-xs text-center py-2 font-medium hover:bg-blue-600 transition shrink-0">
+    ↓ New messages
+  </div>
+
+  <!-- Reply Preview -->
+  <div *ngIf="replyMessage" class="flex items-center bg-gray-100 px-3 py-2 border-t shrink-0 gap-2">
+    <div class="flex-1 min-w-0">
+      <div class="text-xs font-medium text-blue-600">Replying to {{ replyMessage.sender.username }}</div>
+      <div class="text-xs text-gray-500 truncate">{{ replyMessage.content }}</div>
+    </div>
+    <button (click)="cancelReply()" class="shrink-0 text-gray-400 hover:text-red-500 text-lg">✕</button>
+  </div>
+
+  <!-- Edit Message Bar -->
+  <div *ngIf="editingMessageId" class="flex items-center gap-2 px-3 py-2 bg-yellow-50 border-t shrink-0">
+    <span class="text-xs text-yellow-700 font-medium">Editing message</span>
+    <input [(ngModel)]="editingContent" (keydown.enter)="saveEdit()" (keydown.escape)="cancelEdit()"
+      class="flex-1 px-3 py-1.5 border rounded-lg text-sm" />
+    <button (click)="saveEdit()" class="text-blue-600 text-sm font-medium">Save</button>
+    <button (click)="cancelEdit()" class="text-gray-500 text-sm">Cancel</button>
+  </div>
+
+  <!-- Message Input -->
+   <div style="flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom, 0px);">
+  <app-message-input 
+  #messageInputComp
+  (send)="sendMessage($event)" 
+  (typing)="onTyping($event)"
+  (filesSelected)="onFilesSelected($event)">
+</app-message-input>
+</div>
+
+  <!-- Members Modal -->
+  <div *ngIf="showMembers" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl w-full max-w-sm max-h-[70vh] overflow-y-auto shadow-xl">
+      <div class="p-4 border-b">
+        <h3 class="text-lg font-bold">Group Members</h3>
+      </div>
+
+      <div class="p-2">
+        <div *ngFor="let member of groupMembers"
+          class="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+          <div class="flex items-center gap-2">
+            <app-avatar [name]="member.username" [url]="member.avatarUrl" [online]="member.isOnline"></app-avatar>
+            <div>
+              <div class="text-sm font-medium">{{ member.username }}</div>
+              <div *ngIf="member.role === 'Admin'" class="text-xs text-blue-500">Admin</div>
+            </div>
+          </div>
+          <button *ngIf="isGroupAdmin && member.userId !== currentUserId" (click)="removeMember(member.userId)"
+            class="text-red-500 text-xs font-medium hover:bg-red-50 px-2 py-1 rounded">
+            Remove
+          </button>
+        </div>
+      </div>
+
+      <!-- Add Member -->
+      <div *ngIf="isGroupAdmin" class="p-3 border-t">
+        <label class="text-xs font-medium text-gray-500 mb-1 block">Add member by User ID</label>
+        <div class="flex gap-2">
+          <input [(ngModel)]="newMemberId" placeholder="Enter user ID"
+            class="flex-1 border rounded-lg px-3 py-2 text-sm" />
+          <button (click)="addMember()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+            Add
+          </button>
+        </div>
+      </div>
+
+      <div class="p-3 border-t">
+        <button (click)="showMembers = false"
+          class="w-full bg-gray-100 text-gray-700 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- No Chat Selected -->
+<div *ngIf="!activeConversationId"
+  class="flex-1 flex flex-col items-center justify-center text-gray-400 bg-gray-50 p-8">
+  <div class="text-6xl mb-4">💬</div>
+  <p class="text-lg font-medium text-gray-500">Select a conversation</p>
+  <p class="text-sm text-gray-400 mt-1">Choose a chat from the list to start messaging</p>
+</div>

@@ -2,10 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ChatappFrontend</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+  <title>💬 Chit | Chat</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+  html, body {
+  height: 100%;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh;
+}
+
+/* Fix for mobile browsers */
+@supports (height: 100dvh) {
+  html, body, app-root {
+    height: 100dvh;
+  }
+}
+
+/* Ensure input is always visible */
+app-message-input {
+  position: sticky !important;
+  bottom: 0 !important;
+  z-index: 999 !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+}
+
+/* Prevent zoom on input focus */
+input, textarea {
+  font-size: 16px !important;
+}
+  </style>
 </head>
 <body>
   <app-root></app-root>
