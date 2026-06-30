@@ -51,6 +51,32 @@
             </div>
           </div>
 
+          <!-- Notification Bell -->
+<!-- Notification Panel -->
+<!-- Notification Bell -->
+<button (click)="toggleNotifications()" class="relative mr-2">
+ <!-- Modern Outlined Bell -->
+<button class="relative p-2 text-gray-600 hover:text-blue-600 transition-colors focus:outline-none">
+  <!-- Modern Bell Icon -->
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a2.425 2.425 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+  </svg>
+  
+  <!-- Optional Modern Notification Badge Dot -->
+  <span class="absolute top-1.5 right-1.5 flex h-2.5 w-2.5">
+    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+  </span>
+</button>
+  <span *ngIf="unreadNotificationCount > 0" 
+        class="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+    {{ unreadNotificationCount > 99 ? '99+' : unreadNotificationCount }}
+  </span>
+</button>
+
+
+<app-notification-panel *ngIf="showNotifications" (close)="showNotifications = false"></app-notification-panel>
+
           <!-- Logout Button -->
           <!-- Logout Button (Icon Only) -->
           <button (click)="logout()"
@@ -69,25 +95,6 @@
 
   <!-- Chat window -->
   <div class="flex-1 flex flex-col" [class.hidden]="isMobile && !conversationId" [class.lg:flex]="true">
-
-    <!-- Mobile Header with Back Button -->
-    <!-- <div *ngIf="isMobile && conversationId"
-         class="flex items-center gap-3 px-3 py-2 bg-white border-b shadow-sm shrink-0">
-      <button (click)="goBack()"
-              class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 active:scale-95 transition-all duration-200">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-gray-700">
-          <path fill-rule="evenodd" d="M7.72 12.53a.75.75 0 010-1.06l7.5-7.5a.75.75 0 111.06 1.06L9.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5z" clip-rule="evenodd" />
-        </svg>
-      </button>
-      <div class="flex items-center gap-2 flex-1 min-w-0">
-        <app-avatar [name]="conversationName" [url]="avatarUrl" [online]="isOnline" class="shrink-0"></app-avatar>
-        <div class="min-w-0">
-          <div class="text-sm font-semibold text-gray-900 truncate">{{ conversationName }}</div>
-          <div class="text-xs text-gray-500">{{ isOnline ? 'Online' : 'Last seen recently' }}</div>
-        </div>
-      </div>
-    </div> -->
-
     <app-chat-window></app-chat-window>
   </div>
 </div>

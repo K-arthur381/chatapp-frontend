@@ -1,0 +1,53 @@
+<div class="fixed inset-0 z-50 flex justify-end">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/30" (click)="close.emit()"></div>
+  
+  <!-- Panel -->
+  <div class="relative w-full max-w-sm bg-white h-full shadow-xl flex flex-col">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 border-b">
+      <h2 class="text-lg font-bold">Notifications</h2>
+      <div class="flex items-center gap-2">
+        <button (click)="markAllAsRead()" class="text-sm text-blue-600 hover:underline">
+          Mark all read
+        </button>
+        <button (click)="close.emit()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+      </div>
+    </div>
+
+    <!-- Notifications List -->
+    <div class="flex-1 overflow-y-auto">
+      <div *ngIf="loading" class="p-8 text-center text-gray-400">Loading...</div>
+      
+      <div *ngIf="!loading && notifications.length === 0" class="p-8 text-center text-gray-400">
+        No notifications
+      </div>
+
+      <div *ngFor="let notification of notifications" 
+           (click)="markAsRead(notification)"
+           class="flex items-start gap-3 px-4 py-3 border-b hover:bg-gray-50 cursor-pointer transition"
+           [class.bg-blue-50]="!notification.isRead">
+        
+        <!-- Icon -->
+        <div class="shrink-0 mt-1">
+          <span *ngIf="notification.type === 'NewMessage'" class="text-xl">💬</span>
+          <span *ngIf="notification.type === 'GroupInvite'" class="text-xl">👥</span>
+          <span *ngIf="notification.type === 'System'" class="text-xl">⚠️</span>
+          <span *ngIf="notification.type === 'Reaction'" class="text-xl">❤️</span>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between gap-2">
+            <span class="text-sm font-semibold truncate">{{ notification.title }}</span>
+            <span class="text-xs text-gray-400 shrink-0">{{ getTimeAgo(notification.createdAt) }}</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-0.5">{{ notification.body }}</p>
+        </div>
+
+        <!-- Unread dot -->
+        <div *ngIf="!notification.isRead" class="shrink-0 mt-2 w-2 h-2 bg-blue-600 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+</div>

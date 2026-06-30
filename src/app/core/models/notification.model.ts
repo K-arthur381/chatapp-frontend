@@ -1,6 +1,5 @@
 export interface AppNotification {
   notificationId: string;
-  userId: string;
   type: string;
   title: string;
   body?: string;

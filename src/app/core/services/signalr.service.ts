@@ -3,6 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import { environment } from '../../../environments/environment';
 import { AuthService } from './auth.service';
 import { Message } from '../models/message.model';
+import { AppNotification } from '../models/notification.model';
 
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
@@ -26,6 +27,8 @@ export class SignalRService {
   public messageEdited = new EventEmitter<any>();
   public messageDeleted = new EventEmitter<any>();
   public allMessagesRead = new EventEmitter<any>();
+  public newNotification = new EventEmitter<AppNotification>();
+
 
   constructor(private auth: AuthService) {}
 
@@ -102,6 +105,8 @@ export class SignalRService {
     this.hubConnection.on('MessageEdited', (data: any) => this.messageEdited.emit(data));
     this.hubConnection.on('MessageDeleted', (data: any) => this.messageDeleted.emit(data));
     this.hubConnection.on('AllMessagesRead', (data: any) => this.allMessagesRead.emit(data));
+    this.hubConnection.on('NewNotification', (data: AppNotification) => {this.newNotification.emit(data);
+});
   }
 
   // ✅ Queue message if not connected, send immediately if connected

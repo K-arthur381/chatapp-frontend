@@ -8,6 +8,8 @@
         <p class="text-sm text-gray-500 mt-1">Sign in to continue chatting</p>
       </div>
 
+
+
       <!-- Form -->
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-5">
         <!-- Email -->
@@ -61,3 +63,11 @@
     </div>
   </div>
 </div>
+
+<!-- In your component .html template -->
+<!-- <button (click)="getMyDeviceToken()">🔑 Get My Device Token</button>
+
+<div *ngIf="fcmToken">
+  <strong>Your FCM Token:</strong>
+  <code>{{ fcmToken }}</code>
+</div> -->

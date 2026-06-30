@@ -5,6 +5,8 @@ import { SignalRService } from '../../../../core/services/signalr.service';
 import { ChatService } from '../../../../core/services/chat.service';
 import { Subscription } from 'rxjs';
 import { User } from '../../../../core/models/user.model';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-chat-main',
@@ -13,6 +15,8 @@ import { User } from '../../../../core/models/user.model';
 })
 export class ChatMainComponent implements OnInit, OnDestroy {
   isMobile = false;
+  showNotifications = false;
+unreadNotificationCount = 0;
   currentUser: User | null = null;
   conversationName: string = '';
 avatarUrl?: string;
@@ -21,8 +25,11 @@ isOnline: boolean = false;
   conversationId: string | undefined;
   private routeSub: Subscription | undefined;
   currentUserId!: string;
+ private subs = new Subscription();
 
   constructor(
+     private toast : ToastService ,
+    private notificationService: NotificationService,
     private auth: AuthService,
     private signalR: SignalRService,
       private chatService: ChatService,
@@ -33,6 +40,19 @@ isOnline: boolean = false;
   }
 
   ngOnInit(): void {
+    // Load unread count
+      this.subs.add(
+  this.notificationService.getUnreadCount().subscribe(count => {
+    this.unreadNotificationCount = count;
+  }));
+   
+
+  // Listen for real-time updates
+    this.subs.add(
+  this.signalR.newNotification.subscribe(() => {
+    this.unreadNotificationCount++;
+  }));
+
      // Load current user
     this.currentUser = this.auth.getUser();
 
@@ -43,6 +63,15 @@ isOnline: boolean = false;
       this.loadConversationInfo(this.conversationId);
     }
   });
+}
+
+toggleNotifications(): void {
+  this.showNotifications = !this.showNotifications;
+
+    this.notificationService.getUnreadCount().subscribe(count => {
+      this.unreadNotificationCount = count;
+    });
+  
 }
 
 private loadConversationInfo(conversationId: string): void {

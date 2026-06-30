@@ -13,6 +13,7 @@ import { TypingIndicatorComponent } from './components/typing-indicator/typing-i
 import { ReactionPickerComponent } from './components/reaction-picker/reaction-picker.component';
 import { NewChatDialogComponent } from './new-chat-dialog/new-chat-dialog.component';
 import { ImageGalleryComponent } from './image-gallery/image-gallery.component';
+import { NotificationPanelComponent } from '../notifications/notification-panel/notification-panel.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ImageGalleryComponent } from './image-gallery/image-gallery.component';
     TypingIndicatorComponent,
     ReactionPickerComponent,
     NewChatDialogComponent,
-    ImageGalleryComponent
+    ImageGalleryComponent,
+    NotificationPanelComponent
   ],
   imports: [
     CommonModule,

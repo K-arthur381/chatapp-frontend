@@ -6,6 +6,7 @@ import { Conversation } from '../../../../core/models/conversation.model';
 import { Subscription } from 'rxjs';
 import { SignalRService } from '../../../../core/services/signalr.service';
 import { Message } from '../../../../core/models/message.model';
+import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
   selector: 'app-chat-list',
@@ -19,7 +20,7 @@ export class ChatListComponent implements OnInit {
 currentUserId?: string;
 private subs = new Subscription();
 
-  constructor(private chatService: ChatService,private signalR: SignalRService, private storage: StorageService, private router: Router) {}
+  constructor( private toast : ToastService ,private chatService: ChatService,private signalR: SignalRService, private storage: StorageService, private router: Router) {}
 
 
 // ngOnInit(): void {
@@ -35,7 +36,15 @@ ngOnInit(): void {
   this.currentUserId = cachedUser?.userId;
 
     this.loadConversations();
-
+  this.subs.add(
+ // Listen for real-time notifications
+    this.signalR.newNotification.subscribe(notification => {
+      this.toast.show(
+        notification.title, 
+        notification.body ?? "New Message"
+      );
+    })
+     );
     // New conversation created / added to group
     this.subs.add(
       this.signalR.newConversation.subscribe((convDto: any) => {

@@ -77,7 +77,7 @@ editingContent: string = '';
     }));
 
     this.subs.add(this.signalR.userTyping.subscribe(data => {
-      if (data.isTyping) {
+      if (data.isTyping && data.user.userId !== this.currentUserId) {
         this.typingUsers = [...this.typingUsers.filter(u => u.userId !== data.user.userId), data.user];
       } else {
         this.typingUsers = this.typingUsers.filter(u => u.userId !== data.user.userId);
